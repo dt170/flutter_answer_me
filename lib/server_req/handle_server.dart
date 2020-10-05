@@ -70,10 +70,5 @@ class HandleServer {
       ],
       "__v":3
       }
-   *
-   *
-   *
-   *
-   *
    * **/
 }

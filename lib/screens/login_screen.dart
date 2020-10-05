@@ -5,6 +5,7 @@ import 'package:flutter_answer_me/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatefulWidget {
+  static const String id = 'login_screen';
   @override
   _LoginState createState() => _LoginState();
 }
