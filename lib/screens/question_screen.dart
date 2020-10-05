@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_answer_me/bloc/question_bloc.dart';
 import 'package:flutter_answer_me/events/question_event.dart';
+import 'package:flutter_answer_me/model/answers.dart';
 import 'package:flutter_answer_me/model/questions.dart';
 import 'package:flutter_answer_me/server_req/handle_server.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,8 +17,10 @@ class _QuestionScreenState extends State<QuestionScreen> {
   int numOfQuestion = 1;
   int index = 0;
   bool isFinish = false;
-  String _answer = '';
+  List<Answers> answersList = [];
+  String _userAnswer = '';
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   @override
   void initState() {
     super.initState();
@@ -74,7 +77,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                           minLines: 3,
                           maxLines: 5,
                           onSaved: (value) {
-                            _answer = value;
+                            _userAnswer = value;
                           },
                           decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(),
@@ -110,10 +113,18 @@ class _QuestionScreenState extends State<QuestionScreen> {
                                 ? RaisedButton(
                                     color: Colors.redAccent,
                                     onPressed: () {
-                                      setState(() {
-                                        numOfQuestion++;
-                                        index++;
-                                      });
+                                      _formKey.currentState.save();
+                                      if (_formKey.currentState.validate()) {
+                                        Answers answer = Answers(
+                                            questionId: items[index].id,
+                                            answer: _userAnswer);
+                                        answersList.add(answer);
+                                        setState(() {
+                                          numOfQuestion++;
+                                          index++;
+                                          _formKey.currentState.reset();
+                                        });
+                                      }
                                     },
                                     child: Text('Next'),
                                     textColor: Colors.white,
@@ -123,7 +134,9 @@ class _QuestionScreenState extends State<QuestionScreen> {
                                     color: Colors.redAccent,
                                     onPressed: () {
                                       _formKey.currentState.save();
-                                      if (_formKey.currentState.validate()) {}
+                                      if (_formKey.currentState.validate()) {
+                                        //send the form to server
+                                      }
                                     },
                                     child: Text('Finish'),
                                     textColor: Colors.white,
