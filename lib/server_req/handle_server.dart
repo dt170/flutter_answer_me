@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:flutter_answer_me/model/questions.dart';
+import 'package:flutter_answer_me/model/answers.dart';
 
 class HandleServer {
   // final String baseUrl = 'http://localhost:5000/';
@@ -9,16 +12,18 @@ class HandleServer {
       'http://10.0.2.2:5000/'; // for using the emulator on android
   final String _token =
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOnsicXVlc3Rpb25lZElkIjoiNWY3OWY3ZmEyMjQzOTViN2I5MGFlZjk3In0sInJvbGUiOiJRVUVTVElPTkVEIiwiaWF0IjoxNjAxODI5OTIwLCJleHAiOjE2Mzc4Mjk5MjB9.mG9XdGGXOwYu9Xwqu1Htu4XbHPQU2HkxwYMybzpL3ms';
+  final String _postUserUrl = 'api/v1/questioned/answer';
+  final String _getUserQuestionsUrl = 'api/v1/questioned/';
 
+  //TODO: add try and catch to prevent crashing
 // this function return the user question from server
   Future<List<Question>> getUserQuestions() async {
     List<Question> questionList = [];
-    String url = _baseUrl + 'api/v1/questioned/';
+    String url = _baseUrl + _getUserQuestionsUrl;
     print('full url: $url');
 
     // Await the http get response, then decode the json-formatted response.
-    var response = await http.get('http://10.0.2.2:5000/api/v1/questioned/',
-        headers: {"x-auth-token": _token});
+    var response = await http.get(url, headers: {"x-auth-token": _token});
     // if req was good handle the response
     if (response.statusCode == 200) {
       print('Response status: ${response.statusCode}\n');
@@ -38,6 +43,26 @@ class HandleServer {
     }
   }
 
+  //TODO: add try and catch to prevent crashing
+  Future<bool> sendUserAnswer(Answers answer) async {
+    String url = _baseUrl + _postUserUrl;
+
+    var data = convert.jsonEncode(answer.toJson()); // encode the answer to json
+    var response = await http.post(url,
+        headers: {
+          "x-auth-token": _token,
+          "content-type": "application/json",
+        },
+        body: data);
+    print('Response status: ${response.statusCode}\n');
+    print('Response body: ${response.body}\n');
+    if (response.statusCode == 200) {
+      return true;
+    } else {
+      return false;
+    }
+    print('response body:${response.body}');
+  }
 // Example for response getUserQuestion json
   /**
    *{

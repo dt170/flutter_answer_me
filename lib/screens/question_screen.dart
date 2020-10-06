@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_answer_me/bloc/question_bloc.dart';
 import 'package:flutter_answer_me/events/question_event.dart';
 import 'package:flutter_answer_me/model/answers.dart';
@@ -13,21 +14,47 @@ class QuestionScreen extends StatefulWidget {
 
 class _QuestionScreenState extends State<QuestionScreen> {
   final HandleServer server = new HandleServer();
-  List<Question> quesList = [];
-  int numOfQuestion = 1;
-  int index = 0;
-  bool isFinish = false;
-  List<Answers> answersList = [];
-  String _userAnswer = '';
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  int numOfQuestion = 1; //current question display
+  int index = 0; // list index
+  String _userAnswer = ''; // user text answer
+  List<Answers> answersList; // answer
+  var answerTextController =
+      TextEditingController(); // text controller to set previous answers
+  final GlobalKey<FormState> _formKey =
+      GlobalKey<FormState>(); // form controller
 
   @override
   void initState() {
     super.initState();
+    //getting the questions from the server and create list of questions + list of answers
     server.getUserQuestions().then((questionList) {
       BlocProvider.of<QuestionBloc>(context)
           .add(QuestionEvent.setApplication(questionList));
+      answersList = List<Answers>.filled(
+          // setting all question id to -1 = user didn't answer them yet.
+          questionList.length, // same size as question list
+          Answers(
+            questionId: -1,
+          ));
     });
+  }
+
+  void increaseIndex() {
+    numOfQuestion++;
+    index++;
+  }
+
+  void decreaseIndex() {
+    numOfQuestion--;
+    index--;
+  }
+
+  void nextQuestionFillUserAnswer() {
+    answerTextController.text = answersList[index].answer;
+
+    answerTextController.selection = TextSelection.fromPosition(
+      TextPosition(offset: answerTextController.text.length),
+    );
   }
 
   @override
@@ -39,10 +66,15 @@ class _QuestionScreenState extends State<QuestionScreen> {
       body: Container(
         height: double.infinity,
         decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.bottomLeft,
-                end: Alignment.topRight,
-                colors: [Colors.blueAccent, Colors.lightBlueAccent])),
+          gradient: LinearGradient(
+            begin: Alignment.bottomLeft,
+            end: Alignment.topRight,
+            colors: [
+              Colors.blueAccent,
+              Colors.lightBlueAccent
+            ], // need to check why its red
+          ),
+        ),
         child: BlocConsumer<QuestionBloc, List<Question>>(
           builder: (context, items) {
             if (items.length != 0)
@@ -73,11 +105,22 @@ class _QuestionScreenState extends State<QuestionScreen> {
                           height: 40,
                         ),
                         TextFormField(
+                          controller: answerTextController,
                           style: TextStyle(),
                           minLines: 3,
                           maxLines: 5,
                           onSaved: (value) {
                             _userAnswer = value;
+                          },
+                          validator: (value) {
+                            if (value.length < 3) {
+                              return 'Answer most be at least 3 characters';
+                            }
+                            if (value.trim().length <
+                                3) // remove all spaces and check if there are more then 3 chars
+                              return 'Answer most be at least 3 characters';
+
+                            return null;
                           },
                           decoration: InputDecoration(
                             enabledBorder: OutlineInputBorder(),
@@ -90,11 +133,13 @@ class _QuestionScreenState extends State<QuestionScreen> {
                           height: 40,
                         ),
                         Row(
+                          // if first question set the button in the middle else space evenly both buttons
                           mainAxisAlignment: numOfQuestion == 1
                               ? MainAxisAlignment.center
                               : MainAxisAlignment.spaceEvenly,
                           children: [
                             Visibility(
+                              // if first question don't show back button
                               visible: numOfQuestion == 1 ? false : true,
                               child: RaisedButton(
                                 color: Colors.redAccent,
@@ -102,28 +147,44 @@ class _QuestionScreenState extends State<QuestionScreen> {
                                 shape: StadiumBorder(),
                                 onPressed: () {
                                   setState(() {
-                                    numOfQuestion--;
-                                    index--;
+                                    //follow the index and question numbers
+                                    decreaseIndex();
+                                    if (answersList[index].questionId !=
+                                        -1) // if not -1 meaning user answer the question another option is to set all answers as '' and remove this if
+                                      nextQuestionFillUserAnswer();
                                   });
                                 },
                                 child: Text('Back'),
                               ),
                             ),
-                            numOfQuestion != items.length
+                            numOfQuestion !=
+                                    items
+                                        .length // show next button only if the number on current question ot equal to questions.length
                                 ? RaisedButton(
                                     color: Colors.redAccent,
                                     onPressed: () {
                                       _formKey.currentState.save();
                                       if (_formKey.currentState.validate()) {
-                                        Answers answer = Answers(
+                                        Answers temp = Answers(
                                             questionId: items[index].id,
-                                            answer: _userAnswer);
-                                        answersList.add(answer);
-                                        setState(() {
-                                          numOfQuestion++;
-                                          index++;
-                                          _formKey.currentState.reset();
-                                        });
+                                            answer: _userAnswer,
+                                            explanation: '');
+                                        answersList[index] =
+                                            temp; // not in demands just fill empty string before sending data
+
+                                        setState(
+                                          () {
+                                            increaseIndex();
+                                            _formKey.currentState.reset();
+                                            answerTextController
+                                                .clear(); // clear the form
+                                            _userAnswer = '';
+                                            if (answersList[index].questionId !=
+                                                -1) {
+                                              nextQuestionFillUserAnswer();
+                                            }
+                                          },
+                                        );
                                       }
                                     },
                                     child: Text('Next'),
@@ -135,7 +196,11 @@ class _QuestionScreenState extends State<QuestionScreen> {
                                     onPressed: () {
                                       _formKey.currentState.save();
                                       if (_formKey.currentState.validate()) {
-                                        //send the form to server
+                                        server
+                                            .sendUserAnswer(answersList[1])
+                                            .then((value) {
+                                          print('The answer was send :$value');
+                                        });
                                       }
                                     },
                                     child: Text('Finish'),
