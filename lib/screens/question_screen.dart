@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_answer_me/bloc/question_bloc.dart';
@@ -55,6 +56,35 @@ class _QuestionScreenState extends State<QuestionScreen> {
 
     answerTextController.selection = TextSelection.fromPosition(
       TextPosition(offset: answerTextController.text.length),
+    );
+  }
+
+  Future<void> _showMyFinishDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text('Finished?'),
+          content: Text('Do you sure you want to finish?'),
+          actions: [
+            CupertinoDialogAction(
+              child: FlatButton(
+                onPressed: () {},
+                child: Text('Yes'),
+              ),
+            ),
+            CupertinoDialogAction(
+              child: FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('No'),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -202,11 +232,13 @@ class _QuestionScreenState extends State<QuestionScreen> {
                                     onPressed: () {
                                       _formKey.currentState.save();
                                       if (_formKey.currentState.validate()) {
-                                        server
-                                            .sendUserAnswer(answersList[1])
-                                            .then((value) {
-                                          print('The answer was send :$value');
-                                        });
+                                        // server
+                                        //     .sendUserAnswer(answersList[1])
+                                        //     .then((value) {
+                                        //   print('The answer was send :$value');
+                                        // });
+
+                                        _showMyFinishDialog();
                                       }
                                     },
                                     child: Text('Finish'),

@@ -17,9 +17,7 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     // final auth = Provider.of<AuthProvider>(context);
     return SafeArea(
-
       child: Scaffold(
-
         backgroundColor: Colors.white,
         body: SingleChildScrollView(
           child: // auth.loading
