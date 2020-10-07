@@ -5,11 +5,13 @@ import 'package:flutter_answer_me/bloc/question_bloc.dart';
 import 'package:flutter_answer_me/events/question_event.dart';
 import 'package:flutter_answer_me/model/answers.dart';
 import 'package:flutter_answer_me/model/questions.dart';
+import 'package:flutter_answer_me/screens/finish_screen.dart';
 import 'package:flutter_answer_me/server_req/handle_server.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_answer_me/constants/constants.dart';
 
 class QuestionScreen extends StatefulWidget {
+  static const String id = 'question_screen';
   @override
   _QuestionScreenState createState() => _QuestionScreenState();
 }
@@ -70,7 +72,14 @@ class _QuestionScreenState extends State<QuestionScreen> {
           actions: [
             CupertinoDialogAction(
               child: FlatButton(
-                onPressed: () {},
+                onPressed: () {
+                  for (final answer in answersList) {
+                    server.sendUserAnswer(answer).then((value) {
+                      print('The answer was send : $value');
+                    });
+                  }
+                  Navigator.pushNamed(context, FinishScreen.id);
+                },
                 child: Text('Yes'),
               ),
             ),
@@ -232,12 +241,6 @@ class _QuestionScreenState extends State<QuestionScreen> {
                                     onPressed: () {
                                       _formKey.currentState.save();
                                       if (_formKey.currentState.validate()) {
-                                        // server
-                                        //     .sendUserAnswer(answersList[1])
-                                        //     .then((value) {
-                                        //   print('The answer was send :$value');
-                                        // });
-
                                         _showMyFinishDialog();
                                       }
                                     },
