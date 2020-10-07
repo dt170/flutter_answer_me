@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:http/http.dart' as http;
 import 'dart:convert' as convert;
 import 'package:flutter_answer_me/model/questions.dart';
@@ -61,7 +59,6 @@ class HandleServer {
     } else {
       return false;
     }
-    print('response body:${response.body}');
   }
 // Example for response getUserQuestion json
   /**

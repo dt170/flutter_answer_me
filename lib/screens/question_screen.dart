@@ -6,6 +6,7 @@ import 'package:flutter_answer_me/model/answers.dart';
 import 'package:flutter_answer_me/model/questions.dart';
 import 'package:flutter_answer_me/server_req/handle_server.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_answer_me/constants/constants.dart';
 
 class QuestionScreen extends StatefulWidget {
   @override
@@ -61,20 +62,18 @@ class _QuestionScreenState extends State<QuestionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        actions: [
+          IconButton(
+              icon: Icon(Icons.videocam),
+              onPressed: () {
+                print('Here you will need to navigate Experteasy');
+              })
+        ],
         title: Text('Questions'),
       ),
       body: Container(
-        height: double.infinity,
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.bottomLeft,
-            end: Alignment.topRight,
-            colors: [
-              Colors.blueAccent,
-              Colors.lightBlueAccent
-            ], // need to check why its red
-          ),
-        ),
+        height: double.infinity, //set the background to fill all height
+        decoration: kBackgroundDecorationStyle,
         child: BlocConsumer<QuestionBloc, List<Question>>(
           builder: (context, items) {
             if (items.length != 0)
@@ -87,26 +86,23 @@ class _QuestionScreenState extends State<QuestionScreen> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Center(
-                            child: Text(
-                          'Question $numOfQuestion of ${items.length}',
-                          style: TextStyle(
-                              fontSize: 25,
-                              color: Colors.white,
-                              fontWeight: FontWeight.w700),
-                        )),
+                          child: Text(
+                            'Question $numOfQuestion of ${items.length}',
+                            style: kQuestionHeadLineTextStyle,
+                          ),
+                        ),
                         SizedBox(
                           height: 40,
                         ),
                         Text(
                           items[index].question,
-                          style: TextStyle(fontSize: 20, color: Colors.white),
+                          style: kQuestionTextStyle,
                         ),
                         SizedBox(
                           height: 40,
                         ),
                         TextFormField(
                           controller: answerTextController,
-                          style: TextStyle(),
                           minLines: 3,
                           maxLines: 5,
                           onSaved: (value) {
@@ -147,6 +143,16 @@ class _QuestionScreenState extends State<QuestionScreen> {
                                 shape: StadiumBorder(),
                                 onPressed: () {
                                   setState(() {
+                                    if (numOfQuestion == items.length) {
+                                      // last question save user answer
+                                      _formKey.currentState.save();
+                                      Answers temp = Answers(
+                                          questionId: items[index].id,
+                                          answer: _userAnswer,
+                                          explanation: '');
+                                      answersList[index] =
+                                          temp; // not in demands just fill empty string before sending data
+                                    }
                                     //follow the index and question numbers
                                     decreaseIndex();
                                     if (answersList[index].questionId !=
