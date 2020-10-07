@@ -226,6 +226,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
                                             _formKey.currentState.reset();
                                             answerTextController
                                                 .clear(); // clear the form
+                                            FocusScope.of(context).unfocus();
                                             _userAnswer = '';
                                             if (answersList[index].questionId !=
                                                 -1) {
