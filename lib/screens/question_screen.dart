@@ -72,11 +72,14 @@ class _QuestionScreenState extends State<QuestionScreen> {
           actions: [
             CupertinoDialogAction(
               child: FlatButton(
-                onPressed: () {
+                onPressed: () async {
+                  //   List<Future<bool>> ans = [];
+                  //  var response = Future.wait(ans);
                   for (final answer in answersList) {
-                    server.sendUserAnswer(answer).then((value) {
-                      print('The answer was send : $value');
-                    });
+                    bool temp = await server.sendUserAnswer(answer);
+                    if (temp) {
+                      print('Answer has been sent $temp');
+                    }
                   }
                   Navigator.pushNamed(context, FinishScreen.id);
                 },
@@ -241,6 +244,12 @@ class _QuestionScreenState extends State<QuestionScreen> {
                                     onPressed: () {
                                       _formKey.currentState.save();
                                       if (_formKey.currentState.validate()) {
+                                        Answers temp = Answers(
+                                            questionId: items[index].id,
+                                            answer: _userAnswer,
+                                            explanation: '');
+                                        answersList[index] =
+                                            temp; // not in demands just fill empty string before sending data
                                         _showMyFinishDialog();
                                       }
                                     },
