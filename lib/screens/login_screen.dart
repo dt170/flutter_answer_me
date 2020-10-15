@@ -1,4 +1,5 @@
 import 'package:flutter_answer_me/screens/question_screen.dart';
+import 'package:flutter_answer_me/server_req/handle_server.dart';
 //import 'package:flutter_answer_me/screens/splash.dart';
 import 'package:flutter_answer_me/widgets/custom_button.dart';
 import 'package:flutter_answer_me/widgets/custom_text.dart';
@@ -15,7 +16,8 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    // final auth = Provider.of<AuthProvider>(context);
+    final HandleServer server = new HandleServer();
+
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -89,12 +91,13 @@ class _LoginState extends State<Login> {
             SizedBox(height: 10),
             CustomButton(
                 msg: "Verify",
-                onTap: () {
-                  //    auth.verifyPhoneNumber(context, number.text);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => QuestionScreen()),
-                  );
+                onTap: () async {
+                  bool result = await server.authenticateUser(number.text);
+                  if (result)
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => QuestionScreen()),
+                    );
                 })
           ]),
         ),

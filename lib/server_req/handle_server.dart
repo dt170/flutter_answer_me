@@ -13,10 +13,9 @@ class HandleServer {
       'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1Zjg4NmJkYzMzNDdhMjI0N2EyNWRiYzYiLCJyb2xlIjoiUVVFU1RJT05FRCIsImlhdCI6MTYwMjc3NjE3MSwiZXhwIjoxNjAyODYyNTcxfQ.HiyTi_sS6IiACO1qEAoD0b7f9lI0oEeRThQHES5FVZQ';
   final String _postUserUrl = 'api/v1/questioned/answer';
   final String _getUserQuestionsUrl = 'api/v1/questioned/';
-  final String _phoneVerification =
-      'api/v1/questioned/code'; // TODO: need to check this url
+  final String _phoneVerification = 'api/v1/questioned/code';
+  // TODO: need to check this url
 
-  //TODO: add try and catch to prevent crashing
 // this function return the user question from server
   Future<List<Question>> getUserQuestions() async {
     List<Question> questionList = [];
@@ -44,7 +43,6 @@ class HandleServer {
     }
   }
 
-  //TODO: add try and catch to prevent crashing
   Future<bool> sendUserAnswer(Answers answer) async {
     String url = _baseUrl + _postUserUrl;
 
@@ -77,7 +75,6 @@ class HandleServer {
     try {
       var response = await http.post(url,
           headers: {
-            // "x-auth-token": _token,
             "content-type": "application/json",
           },
           body: data);
