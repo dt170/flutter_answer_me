@@ -140,8 +140,12 @@ class _QuestionScreenState extends State<QuestionScreen> {
                           items[index].question,
                           style: kQuestionTextStyle,
                         ),
+                        Text(
+                          items[index].description,
+                          style: kQuestionTextStyle.copyWith(fontSize: 16),
+                        ),
                         SizedBox(
-                          height: 40,
+                          height: 30,
                         ),
                         TextFormField(
                           controller: answerTextController,

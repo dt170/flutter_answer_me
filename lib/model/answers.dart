@@ -2,6 +2,7 @@ class Answers {
   int questionId;
   String answer = '';
   String explanation = '';
+  String date = '${DateTime.now()}';
 
   Answers({this.questionId, this.answer, this.explanation});
 
@@ -9,5 +10,6 @@ class Answers {
         "questionId": '${this.questionId}',
         "answer": '${this.answer}',
         "explanation": '${this.explanation}',
+        "date": '${this.date}',
       };
 }
