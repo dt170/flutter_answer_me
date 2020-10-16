@@ -35,7 +35,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
     //getting the questions from the server and create list of questions + list of answers
     HandleServer.server.getUserQuestions().then((questionList) {
       BlocProvider.of<QuestionBloc>(context)
-          .add(QuestionEvent.setApplication(questionList));
+          .add(QuestionEvent.setQuestions(questionList));
       answersList = List<Answers>.filled(
           // setting all question id to -1 = user didn't answer them yet.
           questionList.length, // same size as question list

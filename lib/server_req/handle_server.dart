@@ -15,10 +15,11 @@ class HandleServer {
   final String _phoneVerification = 'api/v1/questioned/code';
   final String _smsVerification = 'api/v1/questioned/verify';
 
-  // create singletone
+  // create singletone so the token will be saved after verification
   HandleServer._();
   static final HandleServer server = HandleServer._();
 
+  // create singletone so the token will be saved after verification
   Future<String> get token async {
     print("get token called");
 

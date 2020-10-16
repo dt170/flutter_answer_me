@@ -1,6 +1,6 @@
 import 'package:flutter_answer_me/model/questions.dart';
 
-enum EventType { add, delete, setApplication, update }
+enum EventType { add, delete, setQuestions, update }
 
 class QuestionEvent {
   Question question;
@@ -8,9 +8,9 @@ class QuestionEvent {
   EventType eventType;
   List<Question> questionList;
 
-  QuestionEvent.add(Question application) {
+  QuestionEvent.add(Question question) {
     this.eventType = EventType.add;
-    this.question = application;
+    this.question = question;
   }
 
   QuestionEvent.delete(int index) {
@@ -18,14 +18,14 @@ class QuestionEvent {
     this.questionIndex = index;
   }
 
-  QuestionEvent.setApplication(List<Question> list) {
-    this.eventType = EventType.setApplication;
+  QuestionEvent.setQuestions(List<Question> list) {
+    this.eventType = EventType.setQuestions;
     this.questionList = list;
   }
 
-  QuestionEvent.update(int index, Question application) {
+  QuestionEvent.update(int index, Question question) {
     this.eventType = EventType.update;
     this.questionIndex = index;
-    this.question = application;
+    this.question = question;
   }
 }

@@ -4,7 +4,7 @@ import 'package:flutter_answer_me/events/question_event.dart';
 
 class QuestionBloc extends Bloc<QuestionEvent, List<Question>> {
   QuestionBloc() : super(List<Question>()) {
-    // List<Application>();
+    // List<Question>();
   }
 
   @override
@@ -22,7 +22,7 @@ class QuestionBloc extends Bloc<QuestionEvent, List<Question>> {
         newState.removeAt(event.questionIndex);
         yield newState;
         break;
-      case EventType.setApplication:
+      case EventType.setQuestions:
         yield event.questionList;
         break;
       case EventType.update:

@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_answer_me/screens/question_screen.dart';
 import 'package:flutter_answer_me/server_req/handle_server.dart';
-//import 'package:flutter_answer_me/screens/splash.dart';
 import 'package:flutter_answer_me/widgets/custom_button.dart';
 import 'package:flutter_answer_me/widgets/custom_text.dart';
 import 'package:flutter/material.dart';

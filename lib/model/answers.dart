@@ -6,6 +6,7 @@ class Answers {
 
   Answers({this.questionId, this.answer, this.explanation});
 
+  //turn the answer object to json
   Map<String, dynamic> toJson() => {
         "questionId": '${this.questionId}',
         "answer": '${this.answer}',
