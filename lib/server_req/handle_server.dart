@@ -9,21 +9,36 @@ class HandleServer {
   //TODO: change this to final url when project deploy
   final String _baseUrl =
       'http://10.0.2.2:5000/'; // for using the emulator on android
-  final String _token =
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI1Zjg4NmJkYzMzNDdhMjI0N2EyNWRiYzYiLCJyb2xlIjoiUVVFU1RJT05FRCIsImlhdCI6MTYwMjc3NjE3MSwiZXhwIjoxNjAyODYyNTcxfQ.HiyTi_sS6IiACO1qEAoD0b7f9lI0oEeRThQHES5FVZQ';
+  String _token;
   final String _postUserUrl = 'api/v1/questioned/answer';
   final String _getUserQuestionsUrl = 'api/v1/questioned/';
   final String _phoneVerification = 'api/v1/questioned/code';
+  final String _smsVerification = 'api/v1/questioned/verify';
+
   // TODO: need to check this url
+
+  // create singletone
+  HandleServer._();
+  static final HandleServer server = HandleServer._();
+
+  Future<String> get token async {
+    print("get token called");
+
+    if (_token != null) {
+      return _token;
+    }
+    //TODO: if token null this will cause error win using getUserQuestions() and sendUserAnswer()
+    return null;
+  }
 
 // this function return the user question from server
   Future<List<Question>> getUserQuestions() async {
     List<Question> questionList = [];
     String url = _baseUrl + _getUserQuestionsUrl;
-    print('full url: $url');
 
+    final String tok = await token;
     // Await the http get response, then decode the json-formatted response.
-    var response = await http.get(url, headers: {"x-auth-token": _token});
+    var response = await http.get(url, headers: {"x-auth-token": tok});
     // if req was good handle the response
     if (response.statusCode == 200) {
       print('Response status: ${response.statusCode}\n');
@@ -45,12 +60,12 @@ class HandleServer {
 
   Future<bool> sendUserAnswer(Answers answer) async {
     String url = _baseUrl + _postUserUrl;
-
+    final String tok = await token;
     var data = convert.jsonEncode(answer.toJson()); // encode the answer to json
     try {
       var response = await http.post(url,
           headers: {
-            "x-auth-token": _token,
+            "x-auth-token": tok,
             "content-type": "application/json",
           },
           body: data);
@@ -66,7 +81,7 @@ class HandleServer {
     return false;
   }
 
-// check this function
+// send the phone number to the server in order to get sms code
   Future<bool> authenticateUser(String phone) async {
     String url = _baseUrl + _phoneVerification;
 
@@ -89,6 +104,41 @@ class HandleServer {
       return false;
     }
     return false;
+  }
+
+  //send the user phone number and code for verification on the server
+  Future<bool> verifySms(String phone, String code) async {
+    String url = _baseUrl + _smsVerification;
+
+    var data = convert.jsonEncode({
+      "phoneNumber": "$phone",
+      "code": "$code",
+    }); // encode the answer to json
+    try {
+      var response = await http.post(url,
+          headers: {
+            "content-type": "application/json",
+          },
+          body: data);
+      print('Response status: ${response.statusCode}\n');
+      print('Response body: ${response.body}\n');
+      if (response.statusCode == 200) {
+        print('verifySms was successful!');
+        var token = convert.jsonDecode(response.body)['data']['token'];
+        print(token);
+        //setting the token
+        _setToken(token);
+        return true;
+      }
+    } catch (e) {
+      print('Error in verifySms: $e');
+      return false;
+    }
+    return false;
+  }
+
+  void _setToken(String tok) {
+    this._token = tok;
   }
 
 // Example for response getUserQuestion json

@@ -12,12 +12,14 @@ import 'package:flutter_answer_me/constants/constants.dart';
 
 class QuestionScreen extends StatefulWidget {
   static const String id = 'question_screen';
+  final String token;
+  QuestionScreen({this.token});
   @override
   _QuestionScreenState createState() => _QuestionScreenState();
 }
 
 class _QuestionScreenState extends State<QuestionScreen> {
-  final HandleServer server = new HandleServer();
+  // final HandleServer server = new HandleServer();
   int numOfQuestion = 1; //current question display
   int index = 0; // list index
   String _userAnswer = ''; // user text answer
@@ -31,7 +33,7 @@ class _QuestionScreenState extends State<QuestionScreen> {
   void initState() {
     super.initState();
     //getting the questions from the server and create list of questions + list of answers
-    server.getUserQuestions().then((questionList) {
+    HandleServer.server.getUserQuestions().then((questionList) {
       BlocProvider.of<QuestionBloc>(context)
           .add(QuestionEvent.setApplication(questionList));
       answersList = List<Answers>.filled(
@@ -76,7 +78,8 @@ class _QuestionScreenState extends State<QuestionScreen> {
                   //   List<Future<bool>> ans = [];
                   //  var response = Future.wait(ans);
                   for (final answer in answersList) {
-                    bool temp = await server.sendUserAnswer(answer);
+                    bool temp =
+                        await HandleServer.server.sendUserAnswer(answer);
                     if (temp) {
                       print('Answer has been sent $temp');
                     }

@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_answer_me/screens/question_screen.dart';
 import 'package:flutter_answer_me/server_req/handle_server.dart';
 //import 'package:flutter_answer_me/screens/splash.dart';
@@ -13,11 +15,54 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   TextEditingController number = TextEditingController();
+  TextEditingController code = TextEditingController();
+
+  Future<void> _showMyFinishDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: Text('Please enter SMS code'),
+          content: CupertinoTextField(
+            controller: code,
+            keyboardType: TextInputType.number,
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp("[0-9]"))
+            ],
+          ),
+          actions: [
+            CupertinoDialogAction(
+              child: FlatButton(
+                onPressed: () async {
+                  bool response = await HandleServer.server
+                      .verifySms(number.text, code.text);
+                  print(response);
+                  if (response)
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => QuestionScreen()),
+                    );
+                },
+                child: Text('Done'),
+              ),
+            ),
+            CupertinoDialogAction(
+              child: FlatButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: Text('Cancel'),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    final HandleServer server = new HandleServer();
-
     return SafeArea(
       child: Scaffold(
         backgroundColor: Colors.white,
@@ -67,6 +112,9 @@ class _LoginState extends State<Login> {
                   child: TextField(
                     keyboardType: TextInputType.phone,
                     controller: number,
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(RegExp("[0-9|+]")),
+                    ],
                     decoration: InputDecoration(
                         icon: Icon(Icons.phone_android, color: Colors.grey),
                         border: InputBorder.none,
@@ -92,12 +140,9 @@ class _LoginState extends State<Login> {
             CustomButton(
                 msg: "Verify",
                 onTap: () async {
-                  bool result = await server.authenticateUser(number.text);
-                  if (result)
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => QuestionScreen()),
-                    );
+                  bool result =
+                      await HandleServer.server.authenticateUser(number.text);
+                  if (result) _showMyFinishDialog();
                 })
           ]),
         ),
