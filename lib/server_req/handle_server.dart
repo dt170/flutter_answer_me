@@ -15,8 +15,6 @@ class HandleServer {
   final String _phoneVerification = 'api/v1/questioned/code';
   final String _smsVerification = 'api/v1/questioned/verify';
 
-  // TODO: need to check this url
-
   // create singletone
   HandleServer._();
   static final HandleServer server = HandleServer._();
