@@ -5,7 +5,6 @@ import 'screens/login_screen.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'bloc/question_bloc.dart';
 
-// Made by
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {

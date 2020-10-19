@@ -6,38 +6,28 @@ import 'package:flutter_answer_me/model/answers.dart';
 
 class HandleServer {
   // final String baseUrl = 'http://localhost:5000/';
-  //TODO: change this to final url when project deploy
+  //TODO: change this to the final url when project deploy
   final String _baseUrl =
       'http://10.0.2.2:5000/'; // for using the emulator on android
   String _token;
-  final String _postUserUrl = 'api/v1/questioned/answer';
+
+  final String _postAnswersUrl = 'api/v1/questioned/answer';
   final String _getUserQuestionsUrl = 'api/v1/questioned/';
   final String _phoneVerification = 'api/v1/questioned/code';
   final String _smsVerification = 'api/v1/questioned/verify';
 
-  // create singletone so the token will be saved after verification
+  // create static so the token will be saved after verification
   HandleServer._();
   static final HandleServer server = HandleServer._();
-
-  // create singletone so the token will be saved after verification
-  Future<String> get token async {
-    print("get token called");
-
-    if (_token != null) {
-      return _token;
-    }
-    //TODO: if token null this will cause error win using getUserQuestions() and sendUserAnswer()
-    return null;
-  }
 
 // this function return the user question from server
   Future<List<Question>> getUserQuestions() async {
     List<Question> questionList = [];
     String url = _baseUrl + _getUserQuestionsUrl;
 
-    final String tok = await token;
+    // final String tok = await token;
     // Await the http get response, then decode the json-formatted response.
-    var response = await http.get(url, headers: {"x-auth-token": tok});
+    var response = await http.get(url, headers: {"x-auth-token": _token});
     // if req was good handle the response
     if (response.statusCode == 200) {
       print('Response status: ${response.statusCode}\n');
@@ -58,13 +48,13 @@ class HandleServer {
   }
 
   Future<bool> sendUserAnswer(Answers answer) async {
-    String url = _baseUrl + _postUserUrl;
-    final String tok = await token;
+    String url = _baseUrl + _postAnswersUrl;
+    // final String tok = await token;
     var data = convert.jsonEncode(answer.toJson()); // encode the answer to json
     try {
       var response = await http.post(url,
           headers: {
-            "x-auth-token": tok,
+            "x-auth-token": _token,
             "content-type": "application/json",
           },
           body: data);
@@ -136,41 +126,8 @@ class HandleServer {
     return false;
   }
 
+  //set the token
   void _setToken(String tok) {
     this._token = tok;
   }
-
-// Example for response getUserQuestion json
-  /**
-   *{
-      "answers":{
-
-      },
-      "_id":"5f79f7fa224395b7b90aef97",
-      "firstName":"Dvir",
-      "lastName":"Dvir",
-      "phoneNumber":"+972526573552",
-      "questions":[
-      {
-      "question":"1????",
-      "questionerName":"Marcos Molina",
-      "description":"",
-      "_id":7
-      },
-      {
-      "question":"2????",
-      "questionerName":"Marcos Molina",
-      "description":"",
-      "_id":8
-      },
-      {
-      "question":"3????",
-      "questionerName":"Marcos Molina",
-      "description":"Exampleee",
-      "_id":9
-      }
-      ],
-      "__v":3
-      }
-   * **/
 }

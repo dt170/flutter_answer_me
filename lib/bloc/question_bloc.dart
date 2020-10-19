@@ -10,6 +10,7 @@ class QuestionBloc extends Bloc<QuestionEvent, List<Question>> {
   @override
   Stream<List<Question>> mapEventToState(QuestionEvent event) async* {
     switch (event.eventType) {
+      //add question event
       case EventType.add:
         List<Question> newState = List.from(state);
         if (event.question != null) {
@@ -17,14 +18,17 @@ class QuestionBloc extends Bloc<QuestionEvent, List<Question>> {
         }
         yield newState;
         break;
+      // for future option
       case EventType.delete:
         List<Question> newState = List.from(state);
         newState.removeAt(event.questionIndex);
         yield newState;
         break;
+      //get all questions
       case EventType.setQuestions:
         yield event.questionList;
         break;
+      // for future option
       case EventType.update:
         List<Question> newState = List.from(state);
         newState[event.questionIndex] = event.question;

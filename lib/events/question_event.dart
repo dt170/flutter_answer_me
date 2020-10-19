@@ -12,7 +12,7 @@ class QuestionEvent {
     this.eventType = EventType.add;
     this.question = question;
   }
-
+  // for future option
   QuestionEvent.delete(int index) {
     this.eventType = EventType.delete;
     this.questionIndex = index;
@@ -22,7 +22,7 @@ class QuestionEvent {
     this.eventType = EventType.setQuestions;
     this.questionList = list;
   }
-
+  // for future option
   QuestionEvent.update(int index, Question question) {
     this.eventType = EventType.update;
     this.questionIndex = index;
